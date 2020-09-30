@@ -22,7 +22,8 @@ import java.net.URLClassLoader;
  */
 public class Proxy {
     public static Object newProxyInstance(Class inf, InvocationHandler handler) throws Exception {
-        TypeSpec.Builder typeSpecBuilder = TypeSpec.classBuilder("TimeProxy")
+        String className = "Proxy$0";
+        TypeSpec.Builder typeSpecBuilder = TypeSpec.classBuilder(className)
                 .addModifiers(Modifier.PUBLIC)
                 .addSuperinterface(inf);
 
@@ -47,12 +48,9 @@ public class Proxy {
                     .addStatement("\t$T method = " + inf.getName() + ".class.getMethod(\"" + method.getName() + "\")", Method.class)
                     // 为了简单起见，这里参数直接写死为空
                     .addStatement("\tthis.handler.invoke(this, method, null)")
-                    .addCode("} catch(Exception e) {\n")
+                    .addCode("} catch(Throwable e) {\n")
                     .addCode("\te.printStackTrace();\n")
-                    .addCode("}\n")
-                    .addCode("catch (Throwable throwable) {\n")
-                    .addCode("\tthrowable.printStackTrace();\n")
-                    .addCode("}\n")
+                    .addCode("}")
                     .build();
             typeSpecBuilder.addMethod(methodSpec);
         }
@@ -61,13 +59,11 @@ public class Proxy {
         String sourcePath = "/Users/alex/IdeaProjects/DynamicProxy/proxy/src/main/java/";
         javaFile.writeTo(new File(sourcePath));
 
-        // 编译
-        JavaCompiler.compile(new File(sourcePath + "/com/proxy/TimeProxy.java"));
+        JavaCompiler.compile(new File(sourcePath + "/com/proxy/" + className + ".java"));
 
-        // 使用反射load到内存
         URL[] urls = new URL[] {new URL("file:" + sourcePath)};
         URLClassLoader classLoader = new URLClassLoader(urls);
-        Class clazz = classLoader.loadClass("com.proxy.TimeProxy");
+        Class clazz = classLoader.loadClass("com.proxy." + className);
         Constructor constructor = clazz.getConstructor(InvocationHandler.class);
         Object obj = constructor.newInstance(handler);
 

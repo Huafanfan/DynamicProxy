@@ -4,10 +4,10 @@ import java.lang.Override;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-public class TimeProxy implements Flyable {
+public class Proxy$0 implements Flyable {
   private InvocationHandler handler;
 
-  public TimeProxy(InvocationHandler handler) {
+  public Proxy$0(InvocationHandler handler) {
     this.handler = handler;
   }
 
@@ -16,11 +16,8 @@ public class TimeProxy implements Flyable {
     try {
     	Method method = com.proxy.Flyable.class.getMethod("fly");
     	this.handler.invoke(this, method, null);
-    } catch(Exception e) {
+    } catch(Throwable e) {
     	e.printStackTrace();
-    }
-    catch (Throwable throwable) {
-    	throwable.printStackTrace();
     }
   }
 }
